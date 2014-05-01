@@ -5,6 +5,7 @@ var AppModel = Backbone.Model.extend({
     this.set('currentSong', new SongModel());
     this.set('songQueue', new SongQueue());
 
+
     /* Note that 'this' is passed as the third argument. That third argument is
     the context. The 'play' handler will always be bound to that context we pass in.
     In this example, we're binding it to the App. This is helpful because otherwise
@@ -20,10 +21,18 @@ var AppModel = Backbone.Model.extend({
     params.library.on('enqueue', function(song){
       this.get('songQueue').push(song);
     }, this);
-
+    
     this.get('songQueue').on('stop', function() {
       this.set('currentSong', null);
-    }, this)
+    }, this);
+
+    // Restore cached state
+    var queueState = JSON.parse(window.localStorage._queue);
+    var queuedSongs = this.get('library').filter(function(song) {
+      return queueState.indexOf(song.get('url')) !== -1;
+    });
+
+    for (var i = 0; i < queuedSongs.length; i++) this.get('songQueue').push(queuedSongs[i]);
   }
 
 });
