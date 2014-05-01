@@ -2,6 +2,27 @@ describe('SongQueue', function() {
   var playSpy, songData1, songData2;
 
   beforeEach(function() {
+    library = new Songs([
+      {
+        url: "mp3s/08 4 Page Letter.mp3",
+        title: "4 Page Letter",
+        artist: "Aaliyah"
+      },
+      {
+        url: "mp3s/11 We Need A Resolution.mp3",
+        title: "We Need A Resolution",
+        artist: "Aaliyah"
+      },
+      {
+        url: "mp3s/A Third Song.mp3",
+        title: "The Third Song",
+        artist: "Aaliyah"
+      },
+    ]);
+    // playerView is created in AppView initialize
+    // access with appView.playerView
+    appView = new AppView({model: new AppModel({library: library})});
+
     playSpy = sinon.spy(SongQueue.prototype, 'playFirst');
     songData1 = {
       artist: 'data',
@@ -33,6 +54,39 @@ describe('SongQueue', function() {
         var songQueue = new SongQueue(songData1);
         songQueue.add(songData2);
         expect(playSpy).to.have.not.been.called;
+      });
+    });
+  });
+
+  describe('when a song is removed', function() {
+    describe('when it is the only song in the song queue', function() {
+      it('stops playback', function() {
+        appView.model.get('songQueue').add(library.at(0));
+        expect(appView.playerView.model).to.equal(library.at(0));
+        appView.model.get('songQueue').remove(library.at(0));
+        expect(appView.playerView.model).to.not.equal(library.at(0));
+      });
+    });
+
+    describe('when it is not the only song in the song queue', function() {
+      describe('when it is currently playing', function() {
+        it('advances to the next song', function() {
+          appView.model.get('songQueue').add(library.at(0));
+          appView.model.get('songQueue').add(library.at(1));
+          expect(appView.playerView.model).to.equal(library.at(0));
+          appView.model.get('songQueue').remove(library.at(0));
+          expect(appView.playerView.model).to.equal(library.at(1));
+        });
+      });
+
+      describe('when it is not currently playing', function() {
+        it('does not affect playback', function() {
+          appView.model.get('songQueue').add(library.at(0));
+          appView.model.get('songQueue').add(library.at(1));
+          expect(appView.playerView.model).to.equal(library.at(0));
+          appView.model.get('songQueue').remove(library.at(1));
+          expect(appView.playerView.model).to.equal(library.at(0));
+        });
       });
     });
   });
