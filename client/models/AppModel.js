@@ -27,12 +27,22 @@ var AppModel = Backbone.Model.extend({
     }, this);
 
     // Restore cached state
-    var queueState = JSON.parse(window.localStorage._queue);
-    var queuedSongs = this.get('library').filter(function(song) {
-      return queueState.indexOf(song.get('url')) !== -1;
-    });
+    if (window.localStorage._queue) {
+      var queueState = JSON.parse(window.localStorage._queue);
+      var queuedSongs = this.get('library').filter(function(song) {
+        return queueState.indexOf(song.get('url')) !== -1;
+      });
 
-    for (var i = 0; i < queuedSongs.length; i++) this.get('songQueue').push(queuedSongs[i]);
+      for (var i = 0; i < queuedSongs.length; i++) this.get('songQueue').push(queuedSongs[i]);
+    }
+  },
+
+  play: function(title) {
+    var song = this.get('library').findWhere({title: title});
+    if (song && this.get('songQueue').at(0) !== song) {
+      this.get('songQueue').remove(song);
+      this.get('songQueue').unshift(song);
+    }
   }
 
 });

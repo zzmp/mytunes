@@ -28,7 +28,9 @@ var SongModel = Backbone.Model.extend({
   },
 
   save: function() {
-    window.localStorage[this.get('url')] = this.get('playCount');
+    if (this.get('playCount')) {
+      window.localStorage[this.get('url')] = this.get('playCount');
+    }
   }
 
 });

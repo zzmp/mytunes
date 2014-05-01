@@ -13,7 +13,7 @@ var SongQueueView = Backbone.View.extend({
   },
 
   addView: function(song, collection, options) {
-    this.entryViews[options.at] = new SongQueueEntryView({model: song});
+    this.entryViews.splice(options.at, 0, new SongQueueEntryView({model: song}) );
     this.render();
   },
 
